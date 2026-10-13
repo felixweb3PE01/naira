@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Position Size (₦)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=Inter:wght@400;500;600&family=Roboto+Mono:wght@500;600&display=swap">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg:#0E1116; --grid-line:rgba(255,255,255,0.035); --panel:#171B22; --border:#262C36; --border-soft:#1E232B;
+    --text:#E7E5E0; --muted:#83888F; --muted-2:#565B62; --accent:#C6A23A; --accent-soft:rgba(198,162,58,0.12);
+    --accent-dim:#52461F; --danger:#C4694F; --danger-soft:rgba(196,105,79,0.12); --good:#7A9D6E;
+    padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; }
+  html, body { min-height: 100%; }
+  body {
+    margin:0; background: linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 100% 64px, var(--bg);
+    color:var(--text); font-family:'Inter', system-ui, sans-serif; padding:0 20px 60px;
+  }
+  .shell { max-width:920px; margin:0 auto; }
+  header { display:flex; align-items:center; justify-content:space-between; padding:28px 4px 40px; border-bottom:1px solid var(--border-soft); gap:12px; flex-wrap:wrap; }
+  .brand { display:flex; align-items:center; gap:10px; }
+  .brand-name { font-family:'Space Grotesk', sans-serif; font-size:16px; font-weight:600; }
+  .brand-sub { color:var(--muted-2); font-size:12.5px; margin-left:8px; padding-left:8px; border-left:1px solid var(--border); }
+  .session-tag { display:flex; align-items:center; gap:7px; font-family:'Roboto Mono', monospace; font-size:12px; color:var(--muted); background:var(--panel); border:1px solid var(--border); padding:6px 12px; border-radius:20px; }
+  .session-dot { width:6px; height:6px; border-radius:50%; background:var(--good); }
+  .heading { padding:44px 4px 32px; }
+  .heading h1 { font-family:'Space Grotesk', sans-serif; font-size:30px; font-weight:600; letter-spacing:-0.015em; margin:0 0 10px; }
+  .heading p { margin:0; color:var(--muted); font-size:14.5px; max-width:52ch; line-height:1.6; }
+  .panel { background:var(--panel); border:1px solid var(--border); border-radius:12px; display:grid; grid-template-columns:1fr 1px 360px; box-shadow:0 30px 60px -30px rgba(0,0,0,0.6); }
+  .divider { background:var(--border); }
+  .inputs { padding:36px; display:flex; flex-direction:column; gap:24px; }
+  .field label { display:flex; justify-content:space-between; font-size:12.5px; color:var(--muted); margin-bottom:9px; }
+  .field label .unit { color:var(--muted-2); font-family:'Roboto Mono', monospace; font-size:11.5px; }
+  .field input, .field select { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); font-family:'Roboto Mono', monospace; font-size:15px; padding:12px 13px; border-radius:7px; outline:none; transition:border-color .15s, box-shadow .15s; }
+  .field select { font-family:'Inter', sans-serif; appearance:none; padding-right:34px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2383888F'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 14px center; }
+  .field input:focus, .field select:focus { border-color:var(--accent-dim); box-shadow:0 0 0 3px var(--accent-soft); }
+  .risk-row { display:grid; grid-template-columns:1fr auto; gap:10px; }
+  .toggle { display:flex; border:1px solid var(--border); border-radius:7px; overflow:hidden; height:44px; }
+  .toggle button { background:var(--bg); color:var(--muted); border:none; padding:0 16px; font-size:13.5px; font-family:'Roboto Mono', monospace; cursor:pointer; }
+  .toggle button.active { background:var(--accent-dim); color:var(--accent); }
+  .hint { font-size:12px; color:var(--muted-2); margin-top:7px; line-height:1.5; }
+  .output { padding:36px; display:flex; flex-direction:column; justify-content:center; gap:26px; }
+  .out-label { font-size:12.5px; color:var(--muted); margin-bottom:8px; }
+  .out-value-row { display:flex; align-items:baseline; gap:8px; }
+  .out-value { font-family:'Roboto Mono', monospace; font-size:46px; font-weight:600; color:var(--accent); line-height:1; font-variant-numeric:tabular-nums; }
+  .out-unit { font-family:'Roboto Mono', monospace; font-size:14px; color:var(--muted-2); }
+  .risk-meter { margin-top:16px; }
+  .risk-meter-track { height:5px; background:var(--bg); border-radius:3px; overflow:hidden; border:1px solid var(--border-soft); }
+  .risk-meter-fill { height:100%; width:10%; background:var(--good); border-radius:3px; transition:width .2s, background .2s; }
+  .risk-meter-label { display:flex; justify-content:space-between; margin-top:7px; font-size:11px; color:var(--muted-2); font-family:'Roboto Mono', monospace; }
+  .out-secondary { display:flex; flex-direction:column; gap:15px; padding-top:22px; border-top:1px solid var(--border-soft); }
+  .out-row { display:flex; justify-content:space-between; align-items:baseline; gap:12px; }
+  .out-row .out-label { font-size:13px; margin:0; }
+  .out-num { font-family:'Roboto Mono', monospace; font-size:15px; font-weight:500; font-variant-numeric:tabular-nums; text-align:right; }
+  .out-num small { display:block; font-size:11px; color:var(--muted-2); font-weight:400; }
+  .warn { font-size:12.5px; color:var(--danger); background:var(--danger-soft); border:1px solid rgba(196,105,79,0.25); border-radius:7px; padding:10px 12px; line-height:1.5; display:none; }
+  .warn.show { display:block; }
+  footer { padding:24px 4px 0; color:var(--muted-2); font-size:12px; text-align:center; }
+  @media (max-width:680px) {
+    .panel { grid-template-columns:1fr; } .divider { display:none; }
+    .output { border-top:1px solid var(--border-soft); } .inputs, .output { padding:26px; }
+    header { padding-top:22px; } .heading { padding-top:32px; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <div class="brand">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+        <rect x="0.5" y="0.5" width="25" height="25" rx="6" stroke="#262C36"/>
+        <line x1="7" y1="18" x2="7" y2="9" stroke="#C6A23A" stroke-width="1.6"/>
+        <line x1="13" y1="18" x2="13" y2="6" stroke="#565B62" stroke-width="1.6"/>
+        <line x1="19" y1="18" x2="19" y2="12" stroke="#565B62" stroke-width="1.6"/>
+        <circle cx="7" cy="9" r="1.4" fill="#C6A23A"/>
+      </svg>
+      <span class="brand-name">Sizing</span>
+      <span class="brand-sub">risk &amp; lot calculator · ₦</span>
+    </div>
+    <div class="session-tag"><span class="session-dot"></span><span id="tagText">EUR/USD</span></div>
+  </header>
+
+  <div class="heading">
+    <h1>Position size</h1>
+    <p>Enter your balance in naira, set your risk and stop distance. Lot size, naira risk and pip value update as you type — nothing is saved or sent anywhere.</p>
+  </div>
+
+  <div class="panel">
+    <div class="inputs">
+      <div class="field">
+        <label for="balance">Account balance <span class="unit">NGN</span></label>
+        <input type="number" id="balance" placeholder="5000000" value="5000000">
+      </div>
+      <div class="field">
+        <label for="rate">USD/NGN rate <span class="unit">₦ per $1</span></label>
+        <input type="number" id="rate" placeholder="1500" value="1500">
+        <div class="hint">Used to convert pip value into naira. Set this to your broker's current rate.</div>
+      </div>
+      <div class="field">
+        <label for="riskValue">Risk per trade</label>
+        <div class="risk-row">
+          <input type="number" id="riskValue" placeholder="1" value="1">
+          <div class="toggle">
+            <button id="modePct" class="active">%</button>
+            <button id="modeNaira">₦</button>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="instrument">Instrument</label>
+        <select id="instrument">
+          <option value="EURUSD">EUR/USD</option>
+          <option value="GBPUSD">GBP/USD</option>
+          <option value="USDJPY">USD/JPY</option>
+          <option value="XAUUSD">XAU/USD — Gold</option>
+          <option value="XAGUSD">XAG/USD — Silver</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="sl">Stop loss <span class="unit" id="slUnit">pips</span></label>
+        <input type="number" id="sl" placeholder="20" value="20">
+        <div class="hint" id="slHint">Distance from entry to stop loss.</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="output">
+      <div>
+        <div class="out-label">Lot size</div>
+        <div class="out-value-row">
+          <div class="out-value" id="lotOut">0.00</div>
+          <div class="out-unit">lots</div>
+        </div>
+        <div class="risk-meter">
+          <div class="risk-meter-track"><div class="risk-meter-fill" id="riskFill"></div></div>
+          <div class="risk-meter-label">
+            <span id="riskPctLabel">1.0% of balance</span>
+            <span id="riskZoneLabel">Conservative</span>
+          </div>
+        </div>
+      </div>
+      <div class="out-secondary">
+        <div class="out-row">
+          <span class="out-label">Naira risk</span>
+          <span class="out-num" id="nairaOut">₦0<small id="usdRiskOut">≈ $0.00</small></span>
+        </div>
+        <div class="out-row">
+          <span class="out-label">Pip value / lot</span>
+          <span class="out-num" id="pipOut">₦0<small id="pipUsdOut">≈ $0.00</small></span>
+        </div>
+        <div class="warn" id="warnMsg"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Figures are estimates for planning — confirm exact margin, contract size and pip value with your broker before entering a trade.</footer>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const balanceEl = $('balance'), rateEl = $('rate'), riskValueEl = $('riskValue'),
+        instrumentEl = $('instrument'), slEl = $('sl');
+  let riskMode = 'pct';
+
+  // USD value of one "pip/point" per standard lot.
+  // Gold: 1 point = $1.00 move = $100/lot (100 oz).
+  // Silver: 1 pip = $0.01 move = $50/lot (5,000 oz) — confirm contract size with your broker.
+  const pipValues = { EURUSD: 10, GBPUSD: 10, USDJPY: 9.1, XAUUSD: 100, XAGUSD: 50 };
+  const displayNames = { EURUSD:'EUR/USD', GBPUSD:'GBP/USD', USDJPY:'USD/JPY', XAUUSD:'XAU/USD', XAGUSD:'XAG/USD' };
+
+  const naira = n => '₦' + Math.round(n).toLocaleString('en-NG');
+  const usd = n => '$' + n.toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 });
+
+  function updateInstrumentLabel() {
+    const i = instrumentEl.value;
+    $('tagText').textContent = displayNames[i];
+    if (i === 'XAUUSD') {
+      $('slUnit').textContent = 'points ($1 move)';
+      $('slHint').textContent = 'Gold: 1 point = $1.00 price move = $100/standard lot.';
+    } else if (i === 'XAGUSD') {
+      $('slUnit').textContent = 'pips ($0.01 move)';
+      $('slHint').textContent = 'Silver: 1 pip = $0.01 price move = $50/standard lot (5,000 oz).';
+    } else {
+      $('slUnit').textContent = 'pips';
+      $('slHint').textContent = 'Distance from entry to stop loss.';
+    }
+  }
+
+  function setMode(mode) {
+    riskMode = mode;
+    $('modePct').classList.toggle('active', mode === 'pct');
+    $('modeNaira').classList.toggle('active', mode === 'naira');
+    riskValueEl.placeholder = mode === 'pct' ? '1' : '50000';
+    calculate();
+  }
+
+  function calculate() {
+    const balance = parseFloat(balanceEl.value) || 0;
+    const rate = parseFloat(rateEl.value) || 0;
+    const riskInput = parseFloat(riskValueEl.value) || 0;
+    const sl = parseFloat(slEl.value) || 0;
+    const instrument = instrumentEl.value;
+    const pipUsd = pipValues[instrument];
+    const pipNgn = pipUsd * rate;
+
+    const nairaRisk = riskMode === 'pct' ? balance * (riskInput / 100) : riskInput;
+    const riskPct = balance > 0 ? (nairaRisk / balance) * 100 : 0;
+    const warnings = [];
+    let lotSize = 0;
+
+    if (rate <= 0) {
+      warnings.push('Enter the USD/NGN rate to calculate lot size.');
+    } else if (sl > 0) {
+      lotSize = nairaRisk / (sl * pipNgn);
+    } else if (riskInput > 0) {
+      warnings.push('Enter a stop loss distance to calculate lot size.');
+    }
+
+    $('lotOut').textContent = lotSize > 0 ? lotSize.toFixed(2) : '0.00';
+    $('nairaOut').firstChild.textContent = naira(nairaRisk);
+    $('usdRiskOut').textContent = '≈ ' + usd(rate > 0 ? nairaRisk / rate : 0);
+    $('pipOut').firstChild.textContent = naira(pipNgn);
+    $('pipUsdOut').textContent = '≈ ' + usd(pipUsd);
+    $('riskPctLabel').textContent = riskPct.toFixed(1) + '% of balance';
+    $('riskFill').style.width = Math.min(riskPct / 5 * 100, 100) + '%';
+
+    const fill = $('riskFill'), zone = $('riskZoneLabel');
+    if (riskPct <= 1.5)      { fill.style.background = 'var(--good)';   zone.textContent = 'Conservative'; zone.style.color = 'var(--good)'; }
+    else if (riskPct <= 3)   { fill.style.background = 'var(--accent)'; zone.textContent = 'Moderate';     zone.style.color = 'var(--accent)'; }
+    else                     { fill.style.background = 'var(--danger)'; zone.textContent = 'Aggressive';   zone.style.color = 'var(--danger)'; }
+
+    if (instrument === 'USDJPY') warnings.push('JPY pip value is approximate — confirm against your broker at the live rate.');
+    if (instrument === 'XAGUSD') warnings.push('Silver contract size varies by broker (commonly 5,000 oz) — confirm before trading.');
+
+    // Units sanity check, measured against balance in USD terms
+    const balanceUsd = rate > 0 ? balance / rate : 0;
+    if (lotSize > 0 && balanceUsd > 0 && lotSize > balanceUsd / 1000) {
+      warnings.push('This lot size looks unusually large for your balance — double check the stop-loss units.');
+    }
+
+    const warn = $('warnMsg');
+    warn.classList.toggle('show', warnings.length > 0);
+    warn.textContent = warnings.join(' ');
+  }
+
+  [balanceEl, rateEl, riskValueEl, slEl].forEach(el => el.addEventListener('input', calculate));
+  instrumentEl.addEventListener('change', () => { updateInstrumentLabel(); calculate(); });
+  $('modePct').addEventListener('click', () => setMode('pct'));
+  $('modeNaira').addEventListener('click', () => setMode('naira'));
+
+  updateInstrumentLabel();
+  calculate();
+</script>
+</body>
+</html>
